@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Text
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 import json,os
@@ -6,12 +6,15 @@ import csv, sqlite3
 
 
 #토크나이저 모델 호출
-from model.diana_tokenizer import sci_tokenizer
+from model.diana_tokenizer import sci_tokenizer, query_with_token
 
 app = FastAPI()
 
-
 DB_NAME = "help-diana-word.db"
+
+class DianaText(BaseModel):
+    text : str
+
 
 @app.on_event("startup")
 async def dbsetup():
@@ -41,20 +44,25 @@ def read_root():
     return {"message": "auto-ta-ml-server"}
 
 
-@app.get("/algo-api/tokenizer")
-def tokenizer():
+@app.post("/algo-api/tokenizer")
+def tokenizer(text:DianaText):
 
-    text = """
-    Myeloid derived suppressor cells (MDSC) are immature 
-    myeloid cells with immunosuppressive activity. 
-    They accumulate in tumor-bearing mice and humans 
-    with different types of cancer, including hepatocellular 
-    carcinoma (HCC).
-    """
+    #for test
+    # text = """
+    # Myeloid derived suppressor cells (MDSC) are immature 
+    # myeloid cells with immunosuppressive activity. 
+    # They accumulate in tumor-bearing mice and humans 
+    # with different types of cancer, including hepatocellular 
+    # carcinoma (HCC).
+    # """
+    #Tokenizeing
+    edited_text = sci_tokenizer(text.text)
+    
+    #DB Search
+    data = query_with_token(edited_text)
 
-    edited_text = sci_tokenizer(text)
     res = {}
-    res['data'] = edited_text
+    res['data'] = data
     return res
 
 
