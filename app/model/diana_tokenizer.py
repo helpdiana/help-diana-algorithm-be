@@ -41,7 +41,6 @@ def query_with_token(token_list):
         else:
             result_data.append({token : origin})
         
-    c.commit()
     c.close()
     return result_data
 

@@ -27,7 +27,7 @@ uvicorn main:app --host=0.0.0.0 --port=8000 --reload
 ```
 * production
 ```
-$ gunicorn -k uvicorn.workers.UvicornWorker --access-logfile ./gunicorn-access.log main:app --bind 0.0.0.0:8000 --workers 2 --daemon
+$ gunicorn -k uvicorn.workers.UvicornWorker --access-logfile ./gunicorn-access.log main:app --bind 0.0.0.0:8000 --workers 1 --daemon
 
 ```
 ## 4. DOCS
