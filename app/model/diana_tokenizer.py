@@ -30,16 +30,19 @@ def query_with_token(token_list):
     for token in token_list:
         # print(token)
         c.execute("SELECT * FROM t WHERE key=? COLLATE NOCASE", (token,))
+        c.commit()
         origin = c.fetchall()
         if not origin:
             c.execute("SELECT * FROM t WHERE key like ? COLLATE NOCASE", (token,))
+            c.commit()
             result = c.fetchall()
             if result:
                 result_data.append({token : result})
         else:
             result_data.append({token : origin})
-
-
+        
+    c.commit()
+    c.close()
     return result_data
 
 def sci_tokenizer(ocr_text):
