@@ -1,5 +1,6 @@
 from typing import Optional, Text
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
+
 from pydantic import BaseModel
 import json,os
 import csv, sqlite3
@@ -45,7 +46,7 @@ def read_root():
 
 
 @app.post("/algo-api/tokenizer")
-def tokenizer(text:DianaText):
+def tokenizer(text:str=Form(...)):
 
     #for test
     # text = """
@@ -56,7 +57,7 @@ def tokenizer(text:DianaText):
     # carcinoma (HCC).
     # """
     #Tokenizeing
-    edited_text = sci_tokenizer(text.text)
+    edited_text = sci_tokenizer(text)
     
     #DB Search
     data = query_with_token(edited_text)
