@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Form
 from pydantic import BaseModel
 import json,os
 import csv, sqlite3
+import nltk
 
 
 #토크나이저 모델 호출
@@ -14,14 +15,14 @@ app = FastAPI()
 DB_NAME = "help-diana-word.db"
 
 class DianaText(BaseModel):
-    text : str
+    data : list
 
 
 @app.on_event("startup")
 async def dbsetup():
     
     print("HELP DIANA SERVER START")
-
+    nltk.download('punkt')
     if not os.path.isfile(DB_NAME):
         print("---------DB SETUP---------")
         con = sqlite3.connect(DB_NAME)
@@ -46,24 +47,21 @@ def read_root():
 
 
 @app.post("/algo-api/tokenizer")
-def tokenizer(text:str=Form(...)):
-
-    #for test
-    # text = """
-    # Myeloid derived suppressor cells (MDSC) are immature 
-    # myeloid cells with immunosuppressive activity. 
-    # They accumulate in tumor-bearing mice and humans 
-    # with different types of cancer, including hepatocellular 
-    # carcinoma (HCC).
-    # """
-    #Tokenizeing
-    edited_text = sci_tokenizer(text)
+def tokenizer(text:DianaText):
+    diagnose_data = text.data[0]
+    #for test  --> check sample.json
     
+    #Tokenizeing
+    edited_text = sci_tokenizer(diagnose_data)
+    print(edited_text)
+
     #DB Search
     data = query_with_token(edited_text)
 
+    print(data)
     res = {}
     res['data'] = data
+
     return res
 
 
